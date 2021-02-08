@@ -4,24 +4,22 @@ import (
 	"fmt"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
-	"github.com/shirou/gopsutil/v3/cpu"
+	"github.com/shirou/gopsutil/v3/mem"
 	"log"
 	"time"
 )
 
-func InitCPU() (gtk.IWidget, error) {
-
-	cpuLabel, err := gtk.LabelNew("cpu")
+func InitMem() (gtk.IWidget, error) {
+	memLabel, err := gtk.LabelNew("mem")
 	if err != nil {
 		return nil, err
 	}
 
 	go func() {
 		for {
-			c, err := cpu.Percent(5*time.Second, false)
-
-			s := fmt.Sprintf("cpu: %.0f %%", c[0])
-			_, err = glib.IdleAdd(cpuLabel.SetText, s)
+			m, err := mem.VirtualMemory()
+			s := fmt.Sprintf("mem: %.0f %%", m.UsedPercent)
+			_, err = glib.IdleAdd(memLabel.SetText, s)
 			if err != nil {
 				log.Fatal("IdleAdd() failed:", err)
 			}
@@ -29,5 +27,5 @@ func InitCPU() (gtk.IWidget, error) {
 		}
 	}()
 
-	return cpuLabel, nil
+	return memLabel, nil
 }

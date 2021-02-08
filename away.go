@@ -50,6 +50,11 @@ func main() {
 		log.Fatal("ui error")
 	}
 	b.Add(cpu)
+	mem, err := InitMem()
+	if err != nil {
+		log.Fatal("ui error")
+	}
+	b.Add(mem)
 
 	win.Add(b)
 	// Set the default window size.
