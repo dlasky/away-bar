@@ -39,6 +39,12 @@ func main() {
 		log.Fatal("ui error")
 	}
 
+	ws, err := InitWorkspaces()
+	if err != nil {
+		log.Fatal("ui error")
+	}
+	b.Add(ws)
+
 	clock, err := InitClock("3:04 PM")
 	if err != nil {
 		log.Fatal("ui error")
