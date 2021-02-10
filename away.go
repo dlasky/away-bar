@@ -34,7 +34,7 @@ func main() {
 
 	layershell.AutoExclusiveZoneEnable(win)
 
-	b, err := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL, 0)
+	b, err := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL, 5)
 	if err != nil {
 		log.Fatal("ui error")
 	}

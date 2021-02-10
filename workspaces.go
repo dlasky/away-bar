@@ -3,11 +3,17 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 	"go.i3wm.org/i3/v4"
 	"log"
 	"os/exec"
 )
+
+type wsLabel struct {
+	label *gtk.Label
+	ws    i3.Workspace
+}
 
 func InitWorkspaces() (gtk.IWidget, error) {
 
@@ -38,14 +44,14 @@ func InitWorkspaces() (gtk.IWidget, error) {
 		return nil, err
 	}
 
-	var wsWidgets = []*gtk.Label{}
+	var wsWidgets = []wsLabel{}
 
 	for _, w := range wsList {
 		l, err := gtk.LabelNew(w.Name)
 		if err != nil {
 			return nil, err
 		}
-		wsWidgets = append(wsWidgets, l)
+		wsWidgets = append(wsWidgets, wsLabel{l, w})
 		b.Add(l)
 	}
 
@@ -54,7 +60,22 @@ func InitWorkspaces() (gtk.IWidget, error) {
 		recv := i3.Subscribe(i3.WorkspaceEventType)
 		for recv.Next() {
 			ev := recv.Event().(*i3.WorkspaceEvent)
-			log.Printf("ws: %v", ev.Old)
+
+			for _, wsl := range wsWidgets {
+				if int64(ev.Old.ID) == int64(wsl.ws.ID) {
+
+					_, err := glib.IdleAdd(wsl.label.SetLabel, ev.Old.Name)
+					if err != nil {
+						log.Fatal("ui error")
+					}
+				}
+				if int64(ev.Current.ID) == int64(wsl.ws.ID) {
+					glib.IdleAdd(wsl.label.SetLabel, fmt.Sprintf("[%v]", ev.Current.Name))
+					if err != nil {
+						log.Fatal("ui error")
+					}
+				}
+			}
 		}
 		log.Fatal(recv.Close())
 	}()
