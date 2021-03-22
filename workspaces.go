@@ -11,7 +11,7 @@ import (
 )
 
 type wsLabel struct {
-	label *gtk.Label
+	label *gtk.Button
 	ws    i3.Workspace
 }
 
@@ -46,11 +46,16 @@ func InitWorkspaces() (gtk.IWidget, error) {
 
 	var wsWidgets = []wsLabel{}
 
-	for _, w := range wsList {
-		l, err := gtk.LabelNew(w.Name)
+	for i, w := range wsList {
+		l, err := gtk.ButtonNew()
+		l.SetLabel(w.Name)
 		if err != nil {
 			return nil, err
 		}
+		i := i
+		l.Connect("clicked", func() {
+			i3.RunCommand(fmt.Sprintf("workspace %v", i+1))
+		})
 		wsWidgets = append(wsWidgets, wsLabel{l, w})
 		b.Add(l)
 	}
