@@ -22,7 +22,7 @@ func InitClock(format string) (gtk.IWidget, error) {
 			if err != nil {
 				log.Fatal("IdleAdd() failed:", err)
 			}
-			time.Sleep(5 * time.Second)
+			time.Sleep(60 * time.Second)
 		}
 	}()
 
