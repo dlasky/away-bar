@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/dlasky/gotk3-layershell/layershell"
+	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
 	"log"
 )
@@ -9,6 +10,17 @@ import (
 func main() {
 	// Initialize GTK without parsing any command line arguments.
 	gtk.Init(nil)
+
+	css, err := gtk.CssProviderNew()
+	if err != nil {
+		log.Fatal("unable to create css provider")
+	}
+	css.LoadFromPath("style.css") //TODO: xdg config
+	screen, err := gdk.ScreenGetDefault()
+	if err != nil {
+		log.Fatal()
+	}
+	gtk.AddProviderForScreen(screen, css, 1)
 
 	// Create a new toplevel window, set its title, and connect it to the
 	// "destroy" signal to exit the GTK main loop when it is destroyed.
