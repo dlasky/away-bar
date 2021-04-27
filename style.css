@@ -1,0 +1,9 @@
+.workspace {
+  color: green;
+  background: black;
+}
+
+.workspace.focused {
+  color: black;
+  background: orange;
+}

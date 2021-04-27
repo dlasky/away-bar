@@ -1,89 +1,55 @@
 package main
 
 import (
-	"bytes"
-	"fmt"
-	"github.com/gotk3/gotk3/glib"
-	"github.com/gotk3/gotk3/gtk"
-	"go.i3wm.org/i3/v4"
+	"context"
 	"log"
-	"os/exec"
+
+	"github.com/gotk3/gotk3/gtk"
+	"github.com/joshuarubin/go-sway"
 )
 
-type wsLabel struct {
-	label *gtk.Button
-	ws    i3.Workspace
+type WSEHandler struct {
+	sway.EventHandler
+	wbox *WorkspaceBox
+}
+
+func (wse WSEHandler) Workspace(ctx context.Context, ev sway.WorkspaceEvent) {
+	// fmt.Printf("evt %+v", ev)
+	wse.wbox.Focus(ev.Current.ID)
+
 }
 
 func InitWorkspaces() (gtk.IWidget, error) {
-
-	//i3 overrides to work with sway
-	i3.SocketPathHook = func() (string, error) {
-		out, err := exec.Command("sway", "--get-socketpath").CombinedOutput()
-		if err != nil {
-			return "", fmt.Errorf("getting sway socketpath: %v (output: %s)", err, out)
-		}
-		return string(out), nil
-	}
-
-	i3.IsRunningHook = func() bool {
-		out, err := exec.Command("pgrep", "-c", "sway\\$").CombinedOutput()
-		if err != nil {
-			log.Printf("sway running: %v (output: %s)", err, out)
-		}
-		return bytes.Compare(out, []byte("1")) == 0
-	}
-
-	wsList, err := i3.GetWorkspaces()
+	//todo get this from app in cliapp possibly
+	ctx := context.Background()
+	client, err := sway.New(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	b, err := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL, 2)
+	wbox, err := NewWorkspaceBox()
 	if err != nil {
 		return nil, err
 	}
 
-	var wsWidgets = []wsLabel{}
+	list, err := client.GetWorkspaces(ctx)
+	if err != nil {
+		log.Fatal("Could not list workspaces, is sway running?")
+	}
 
-	for i, w := range wsList {
-		l, err := gtk.ButtonNew()
-		l.SetLabel(w.Name)
-		if err != nil {
-			return nil, err
+	for _, ws := range list {
+		wbox.Add(ws.Name, ws.ID)
+		if ws.Focused {
+			wbox.Focus(ws.ID)
 		}
-		i := i
-		l.Connect("clicked", func() {
-			i3.RunCommand(fmt.Sprintf("workspace %v", i+1))
-		})
-		wsWidgets = append(wsWidgets, wsLabel{l, w})
-		b.Add(l)
 	}
 
 	go func() {
-
-		recv := i3.Subscribe(i3.WorkspaceEventType)
-		for recv.Next() {
-			ev := recv.Event().(*i3.WorkspaceEvent)
-
-			for _, wsl := range wsWidgets {
-				if int64(ev.Old.ID) == int64(wsl.ws.ID) {
-
-					_, err := glib.IdleAdd(wsl.label.SetLabel, ev.Old.Name)
-					if err != nil {
-						log.Fatal("ui error")
-					}
-				}
-				if int64(ev.Current.ID) == int64(wsl.ws.ID) {
-					glib.IdleAdd(wsl.label.SetLabel, fmt.Sprintf("[%v]", ev.Current.Name))
-					if err != nil {
-						log.Fatal("ui error")
-					}
-				}
-			}
+		h := WSEHandler{
+			wbox: wbox,
 		}
-		log.Fatal(recv.Close())
+		sway.Subscribe(ctx, h, sway.EventTypeWorkspace)
 	}()
 
-	return b, nil
+	return wbox.box, nil
 }

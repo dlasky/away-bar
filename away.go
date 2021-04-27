@@ -1,10 +1,11 @@
 package main
 
 import (
+	"log"
+
 	"github.com/dlasky/gotk3-layershell/layershell"
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
-	"log"
 )
 
 func main() {
@@ -15,12 +16,15 @@ func main() {
 	if err != nil {
 		log.Fatal("unable to create css provider")
 	}
-	css.LoadFromPath("style.css") //TODO: xdg config
+	err = css.LoadFromPath("./style.css") //TODO: xdg config
+	if err != nil {
+		log.Fatal(err)
+	}
 	screen, err := gdk.ScreenGetDefault()
 	if err != nil {
 		log.Fatal()
 	}
-	gtk.AddProviderForScreen(screen, css, 1)
+	gtk.AddProviderForScreen(screen, css, gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
 	// Create a new toplevel window, set its title, and connect it to the
 	// "destroy" signal to exit the GTK main loop when it is destroyed.
