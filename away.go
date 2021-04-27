@@ -78,6 +78,12 @@ func main() {
 	}
 	b.Add(mem)
 
+	bat, err := InitBattery()
+	if err != nil {
+		log.Fatal("ui error")
+	}
+	b.Add(bat)
+
 	win.Add(b)
 	// Set the default window size.
 	win.SetDefaultSize(800, 30)

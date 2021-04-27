@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"time"
+
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/shirou/gopsutil/v3/mem"
-	"log"
-	"time"
 )
 
 func InitMem() (gtk.IWidget, error) {
@@ -18,6 +19,9 @@ func InitMem() (gtk.IWidget, error) {
 	go func() {
 		for {
 			m, err := mem.VirtualMemory()
+			if err != nil {
+				log.Fatal(err)
+			}
 			s := fmt.Sprintf("mem: %.0f %%", m.UsedPercent)
 			_, err = glib.IdleAdd(memLabel.SetText, s)
 			if err != nil {
