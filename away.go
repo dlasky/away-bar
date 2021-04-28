@@ -84,6 +84,12 @@ func main() {
 	}
 	b.Add(bat)
 
+	vol, err := InitPulseAudio()
+	if err != nil {
+		log.Fatal("ui error")
+	}
+	b.Add(vol)
+
 	win.Add(b)
 	// Set the default window size.
 	win.SetDefaultSize(800, 30)
