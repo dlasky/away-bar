@@ -1,17 +1,16 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"time"
 
-	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/shirou/gopsutil/v3/host"
 )
 
 func InitTemp() (gtk.IWidget, error) {
-	tempLabel, err := initBase("temperature", "")
+
+	module, err := NewModule("temperature", "temp: {{(index . 0).Temperature}}C", "./feather/thermometer.svg")
 	if err != nil {
 		return nil, err
 	}
@@ -22,14 +21,9 @@ func InitTemp() (gtk.IWidget, error) {
 			if err != nil {
 				log.Fatal("error getting temps")
 			}
-
-			s := fmt.Sprintf("temp: %.0f %%", temps[0].Temperature)
-			_, err = glib.IdleAdd(tempLabel.SetText, s)
-			if err != nil {
-				log.Fatal("IdleAdd() failed:", err)
-			}
+			module.render(temps)
 			time.Sleep(5 * time.Second)
 		}
 	}()
-	return tempLabel, nil
+	return module.box, nil
 }

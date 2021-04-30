@@ -84,6 +84,12 @@ func main() {
 	}
 	b.Add(bat)
 
+	temp, err := InitTemp()
+	if err != nil {
+		log.Fatal("ui error", err)
+	}
+	b.Add(temp)
+
 	vol, err := InitPulseAudio()
 	if err != nil {
 		log.Fatal("ui error")
