@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/gotk3/gotk3/gtk"
@@ -14,8 +15,15 @@ type WSEHandler struct {
 }
 
 func (wse WSEHandler) Workspace(ctx context.Context, ev sway.WorkspaceEvent) {
-	// fmt.Printf("evt %+v", ev)
-	wse.wbox.Focus(ev.Current.ID)
+	fmt.Printf("evt: %+v\n", ev.Change)
+	switch ev.Change {
+	case "focus":
+		wse.wbox.Focus(ev.Current.ID)
+	case "init":
+		wse.wbox.Add(ev.Current.Name, ev.Current.ID)
+	case "empty":
+		wse.wbox.Remove(ev.Current.ID)
+	}
 
 }
 
