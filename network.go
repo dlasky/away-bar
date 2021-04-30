@@ -23,12 +23,17 @@ func InitNetwork() (gtk.IWidget, error) {
 	/* Show each device path and interface name */
 	for _, device := range devices {
 
-		deviceInterface, err := device.GetPropertyInterface()
+		byt, err := device.MarshalJSON()
 		if err != nil {
 			return nil, err
 		}
+		fmt.Printf("%s\n", byt)
+		// deviceInterface, err := device.GetPropertyInterface()
+		// if err != nil {
+		// 	return nil, err
+		// }
 
-		fmt.Println(deviceInterface + " - " + string(device.GetPath()))
+		// fmt.Println(deviceInterface + " - " + string(device.GetPath()))
 	}
 	return nil, nil
 }
