@@ -78,9 +78,11 @@ func main() {
 	}
 	b.Add(mem)
 
+	InitNetwork()
+
 	bat, err := InitBattery()
 	if err != nil {
-		log.Fatal("ui error")
+		log.Fatal("ui error", err)
 	}
 	b.Add(bat)
 

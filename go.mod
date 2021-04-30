@@ -3,6 +3,7 @@ module dlasky/away-bar
 go 1.15
 
 require (
+	github.com/Wifx/gonetworkmanager v0.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/distatus/battery v0.10.0
 	github.com/dlasky/gotk3-layershell v0.0.0-20210206164207-f6312cc2dcb5
