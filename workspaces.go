@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/joshuarubin/go-sway"
 )
 
 type WSEHandler struct {
 	sway.EventHandler
-	wbox *WorkspaceBox
+	wbox   *WorkspaceBox
+	client sway.Client
 }
 
 func (wse WSEHandler) Workspace(ctx context.Context, ev sway.WorkspaceEvent) {
@@ -29,8 +29,31 @@ func (wse WSEHandler) Workspace(ctx context.Context, ev sway.WorkspaceEvent) {
 }
 
 func (wse WSEHandler) Window(ctx context.Context, ev sway.WindowEvent) {
-	spew.Dump(ev)
+	switch ev.Change {
+	case "new":
+		root, err := wse.client.GetTree(ctx)
+		if err == nil {
+			dumpNodes(root)
+			wse.wbox.AddApplication(ev.Container.Name, ev.Container.ID)
+		}
+	case "close":
+	}
 }
+
+func dumpNodes(node *sway.Node) {
+	for _, n := range node.Nodes {
+		fmt.Println(n.Layout, n.Name)
+		dumpNodes(n)
+	}
+}
+
+// func findParentWorkspace(root *sway.Node, parent *sway.Node, node *sway.Node) (int64, bool) {
+// 	if root.ID == node.ID {
+// 		return parent.ID, true
+// 	} else {
+
+// 	}
+// }
 
 func InitWorkspaces() (gtk.IWidget, error) {
 	//todo get this from app in cliapp possibly
@@ -59,7 +82,8 @@ func InitWorkspaces() (gtk.IWidget, error) {
 
 	go func() {
 		h := WSEHandler{
-			wbox: wbox,
+			wbox:   wbox,
+			client: client,
 		}
 		sway.Subscribe(ctx, h, sway.EventTypeWorkspace, sway.EventTypeWindow)
 	}()

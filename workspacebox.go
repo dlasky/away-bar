@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/gotk3/gotk3/gtk"
 )
 
@@ -89,6 +91,21 @@ func setButtonFocus(btn *gtk.Button, focus bool) error {
 		ctx.AddClass(fc)
 	} else {
 		ctx.RemoveClass(fc)
+	}
+	return nil
+}
+
+func (w *WorkspaceBox) AddApplication(name string, parentID int64) error {
+	fmt.Println("AddApplication")
+	if ws, ok := w.list[parentID]; ok {
+		fmt.Println("found workspace", parentID)
+		img, err := gtk.ImageNewFromIconName(name, 16)
+		if err != nil {
+			return err
+		}
+		ws.Button.Add(img)
+		ws.Button.ShowAll()
+		return nil
 	}
 	return nil
 }
