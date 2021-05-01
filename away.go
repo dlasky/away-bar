@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/dlasky/gotk3-layershell/layershell"
@@ -82,7 +83,7 @@ func main() {
 
 	bat, err := InitBattery()
 	if err != nil {
-		log.Fatal("ui error", err)
+		fmt.Printf("[battery] %v", err)
 	}
 	b.Add(bat)
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"text/template"
 
 	"github.com/gotk3/gotk3/glib"
@@ -55,7 +56,11 @@ func NewModule(name string, templateRaw string, iconPath string) (*Module, error
 	}, nil
 }
 
-func (l *Module) render(value interface{}) error {
+func (l *Module) GetWidget() gtk.IWidget {
+	return l.box
+}
+
+func (l *Module) Render(value interface{}) error {
 	b := bytes.NewBuffer([]byte{})
 	err := l.template.Execute(b, value)
 	if err != nil {
@@ -64,4 +69,8 @@ func (l *Module) render(value interface{}) error {
 	s := b.String()
 	_, err = glib.IdleAdd(l.label.SetText, s)
 	return err
+}
+
+func (l *Module) error(err error) {
+	fmt.Printf("[%v]: %v\n", l.name, err)
 }

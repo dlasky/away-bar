@@ -21,7 +21,7 @@ func InitTemp() (gtk.IWidget, error) {
 			if err != nil {
 				log.Fatal("error getting temps")
 			}
-			module.render(temps)
+			module.Render(temps)
 			time.Sleep(5 * time.Second)
 		}
 	}()

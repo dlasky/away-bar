@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/joshuarubin/go-sway"
 )
@@ -25,6 +26,10 @@ func (wse WSEHandler) Workspace(ctx context.Context, ev sway.WorkspaceEvent) {
 		wse.wbox.Remove(ev.Current.ID)
 	}
 
+}
+
+func (wse WSEHandler) Window(ctx context.Context, ev sway.WindowEvent) {
+	spew.Dump(ev)
 }
 
 func InitWorkspaces() (gtk.IWidget, error) {
@@ -56,7 +61,7 @@ func InitWorkspaces() (gtk.IWidget, error) {
 		h := WSEHandler{
 			wbox: wbox,
 		}
-		sway.Subscribe(ctx, h, sway.EventTypeWorkspace)
+		sway.Subscribe(ctx, h, sway.EventTypeWorkspace, sway.EventTypeWindow)
 	}()
 
 	return wbox.box, nil
