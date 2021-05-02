@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/joshuarubin/go-sway"
 )
@@ -33,27 +34,34 @@ func (wse WSEHandler) Window(ctx context.Context, ev sway.WindowEvent) {
 	case "new":
 		root, err := wse.client.GetTree(ctx)
 		if err == nil {
-			dumpNodes(root)
-			wse.wbox.AddApplication(ev.Container.Name, ev.Container.ID)
+			id, ok := findParentWorkspace(root, nil, &ev.Container)
+			if ok {
+				fmt.Println("found", id, ev.Container.ID)
+				if ev.Container.AppID != nil {
+					wse.wbox.AddApplication(*ev.Container.AppID, id)
+				} else if ev.Container.WindowProperties != nil {
+					spew.Dump(ev.Container.WindowProperties)
+					wse.wbox.AddApplication(ev.Container.WindowProperties.Instance, id)
+				}
+			}
 		}
 	case "close":
 	}
 }
 
-func dumpNodes(node *sway.Node) {
-	for _, n := range node.Nodes {
-		fmt.Println(n.Layout, n.Name)
-		dumpNodes(n)
+func findParentWorkspace(root *sway.Node, parent *sway.Node, target *sway.Node) (int64, bool) {
+	if root.ID == target.ID {
+		return parent.ID, true
+	} else {
+		for _, n := range root.Nodes {
+			id, ok := findParentWorkspace(n, root, target)
+			if ok {
+				return id, ok
+			}
+		}
 	}
+	return 0, false
 }
-
-// func findParentWorkspace(root *sway.Node, parent *sway.Node, node *sway.Node) (int64, bool) {
-// 	if root.ID == node.ID {
-// 		return parent.ID, true
-// 	} else {
-
-// 	}
-// }
 
 func InitWorkspaces() (gtk.IWidget, error) {
 	//todo get this from app in cliapp possibly
