@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/gotk3/gotk3/gtk"
 )
 
@@ -17,7 +15,7 @@ type Workspace struct {
 	Name  string
 	Box   *gtk.Box
 	Label *gtk.Label
-	Apps  []*gtk.Image
+	Apps  map[int64]*gtk.Image
 }
 
 func NewWorkspaceBox() (*WorkspaceBox, error) {
@@ -48,7 +46,7 @@ func (w *WorkspaceBox) Add(name string, ID int64) error {
 		name,
 		box,
 		label,
-		[]*gtk.Image{},
+		map[int64]*gtk.Image{},
 	}
 
 	ctx, err := box.GetStyleContext()
@@ -104,20 +102,26 @@ func setButtonFocus(btn *gtk.Box, focus bool) error {
 	return nil
 }
 
-func (w *WorkspaceBox) AddApplication(name string, parentID int64) error {
-	fmt.Println("AddApplication")
+func (w *WorkspaceBox) AddApplication(name string, ID int64, parentID int64) error {
 	if ws, ok := w.list[parentID]; ok {
-		fmt.Println("found workspace", parentID)
 		img, err := gtk.ImageNewFromIconName(name, gtk.ICON_SIZE_MENU)
 		if err != nil {
-			fmt.Println(err)
 			return err
 		}
-		n, s := img.GetIconName()
-		fmt.Println(n, s)
+		ws.Apps[ID] = img
 		ws.Box.Add(img)
 		ws.Box.ShowAll()
 		return nil
 	}
 	return nil
+}
+
+func (w *WorkspaceBox) RemoveApplication(ID int64, parentID int64) {
+	if ws, ok := w.list[parentID]; ok {
+		if img, ok := ws.Apps[ID]; ok {
+			ws.Box.Remove(img)
+			img.Destroy()
+		}
+
+	}
 }
