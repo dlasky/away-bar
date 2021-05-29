@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/joshuarubin/go-sway"
 )
@@ -34,7 +35,6 @@ func (wse WSEHandler) Window(ctx context.Context, ev sway.WindowEvent) {
 		if err == nil {
 			id, ok := findParentWorkspace(root, nil, &ev.Container)
 			if ok {
-
 				wse.wbox.AddApplication(getName(&ev.Container), ev.Container.ID, id)
 			}
 		}
@@ -51,11 +51,14 @@ func (wse WSEHandler) Window(ctx context.Context, ev sway.WindowEvent) {
 
 func getName(node *sway.Node) string {
 	if node.AppID != nil {
+		fmt.Println(*node.AppID)
 		return *node.AppID
 	} else if node.WindowProperties != nil {
+		fmt.Println(node.WindowProperties.Instance)
 		return node.WindowProperties.Instance
 	}
 	fmt.Println("didnt find name")
+	spew.Dump(node)
 	return ""
 }
 

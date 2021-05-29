@@ -12,6 +12,11 @@ func main() {
 	// Initialize GTK without parsing any command line arguments.
 	gtk.Init(nil)
 
+	err := cacheDesktops()
+	if err != nil {
+		log.Fatal("unable read .desktop files", err)
+	}
+
 	css, err := gtk.CssProviderNew()
 	if err != nil {
 		log.Fatal("unable to create css provider")
