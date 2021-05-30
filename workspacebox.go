@@ -11,9 +11,11 @@ type WorkspaceBox struct {
 }
 
 type Workspace struct {
-	ID     int64
-	Name   string
-	Button *gtk.Button
+	ID    int64
+	Name  string
+	Box   *gtk.Box
+	Label *gtk.Label
+	Apps  map[int64]*gtk.Image
 }
 
 func NewWorkspaceBox() (*WorkspaceBox, error) {
@@ -29,32 +31,48 @@ func NewWorkspaceBox() (*WorkspaceBox, error) {
 
 func (w *WorkspaceBox) Add(name string, ID int64) error {
 
-	btn, err := gtk.ButtonNew()
+	box, err := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL, 0)
 	if err != nil {
 		return err
 	}
-	btn.SetLabel(name)
+	label, err := gtk.LabelNew(name)
+	if err != nil {
+		return err
+	}
+	box.Add(label)
+	box.ShowAll()
 	ws := Workspace{
 		ID,
 		name,
-		btn,
+		box,
+		label,
+		map[int64]*gtk.Image{},
 	}
 
-	ctx, err := btn.GetStyleContext()
+	ctx, err := box.GetStyleContext()
 	if err != nil {
 		return err
 	}
 	ctx.AddClass("workspace")
 
-	w.box.Add(btn)
+	w.box.Add(box)
+	w.box.ShowAll()
 	w.list[ID] = ws
 	return nil
+}
+
+func (w *WorkspaceBox) Remove(ID int64) {
+	if wsb, ok := w.list[ID]; ok {
+		w.box.Remove(wsb.Box)
+		wsb.Box.Destroy()
+		delete(w.list, ID)
+	}
 }
 
 func (w *WorkspaceBox) Focus(ID int64) error {
 
 	if ws, ok := w.list[w.focus]; ok {
-		err := toggleButtonFocus(ws.Button, false)
+		err := setButtonFocus(ws.Box, false)
 		if err != nil {
 			return err
 		}
@@ -62,7 +80,7 @@ func (w *WorkspaceBox) Focus(ID int64) error {
 
 	if wsb, ok := w.list[ID]; ok {
 		w.focus = ID
-		err := toggleButtonFocus(wsb.Button, true)
+		err := setButtonFocus(wsb.Box, true)
 		if err != nil {
 			return err
 		}
@@ -70,26 +88,7 @@ func (w *WorkspaceBox) Focus(ID int64) error {
 	return nil
 }
 
-func (w *WorkspaceBox) FocusOrAdd(name string, ID int64) error {
-	if w.focus == ID {
-		return nil
-	}
-
-	if ws, ok := w.list[w.focus]; ok {
-		toggleButtonFocus(ws.Button, false)
-	}
-
-	if ws, ok := w.list[ID]; ok {
-		w.focus = ID
-		toggleButtonFocus(ws.Button, true)
-		return nil
-	}
-
-	return w.Add(name, ID)
-
-}
-
-func toggleButtonFocus(btn *gtk.Button, focus bool) error {
+func setButtonFocus(btn *gtk.Box, focus bool) error {
 	const fc = "focused"
 	ctx, err := btn.GetStyleContext()
 	if err != nil {
@@ -101,4 +100,28 @@ func toggleButtonFocus(btn *gtk.Button, focus bool) error {
 		ctx.RemoveClass(fc)
 	}
 	return nil
+}
+
+func (w *WorkspaceBox) AddApplication(name string, ID int64, parentID int64) error {
+	if ws, ok := w.list[parentID]; ok {
+		img, err := gtk.ImageNewFromIconName(name, gtk.ICON_SIZE_MENU)
+		if err != nil {
+			return err
+		}
+		ws.Apps[ID] = img
+		ws.Box.Add(img)
+		ws.Box.ShowAll()
+		return nil
+	}
+	return nil
+}
+
+func (w *WorkspaceBox) RemoveApplication(ID int64, parentID int64) {
+	if ws, ok := w.list[parentID]; ok {
+		if img, ok := ws.Apps[ID]; ok {
+			ws.Box.Remove(img)
+			img.Destroy()
+		}
+
+	}
 }

@@ -1,0 +1,37 @@
+{
+    "bar": {
+        "position": "top",
+        "margins":{ "left": 0, "right": 0},
+        "display":"all"
+    },
+    "modules": [
+        {
+            "name":"ws",
+            "type": "workspaces",
+            "applicationIcons": true
+        },
+        {
+            "name":"temperature",
+            "type":"temperature",
+            "output":"temp: {{(index . 0).Temperature}}°C",
+            "icon":"./feather/thermometer.svg"
+        },
+        {
+            "name": "spacer",
+            "type": "icon",
+            "icon": "./feather/octagon.svg"
+        },
+        {
+            "name": "cpu",
+            "type": "cpu",
+            "output":"cpu: {{}}%",
+            "icon": "./feather/cpu.svg"
+        },
+        {
+            "name": "memory",
+            "type": "virtual_mem",
+            "output" : "mem: {{}}%",
+            "icon": "./feather/box.svg"
+        }
+    ]
+}

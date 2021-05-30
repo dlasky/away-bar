@@ -12,6 +12,11 @@ func main() {
 	// Initialize GTK without parsing any command line arguments.
 	gtk.Init(nil)
 
+	err := cacheDesktops()
+	if err != nil {
+		log.Fatal("unable read .desktop files", err)
+	}
+
 	css, err := gtk.CssProviderNew()
 	if err != nil {
 		log.Fatal("unable to create css provider")
@@ -78,11 +83,19 @@ func main() {
 	}
 	b.Add(mem)
 
-	bat, err := InitBattery()
+	InitNetwork()
+
+	// bat, err := InitBattery()
+	// if err != nil {
+	// 	fmt.Printf("[battery] %v", err)
+	// }
+	// b.Add(bat)
+
+	temp, err := InitTemp()
 	if err != nil {
-		log.Fatal("ui error")
+		log.Fatal("ui error", err)
 	}
-	b.Add(bat)
+	b.Add(temp)
 
 	vol, err := InitPulseAudio()
 	if err != nil {
