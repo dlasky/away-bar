@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -32,28 +31,29 @@ func getXDGData() []string {
 	return out
 }
 
-func cacheDesktops() error {
+func cacheDesktops() {
 	dataDirs := getXDGData()
 
 	for _, dir := range dataDirs {
 		files, err := os.ReadDir(dir)
-		if errors.Is(err, os.ErrExist) {
+		if err != nil {
+			fmt.Println("desktop directory error:", err)
 			continue
 		}
 		for _, file := range files {
 			if filepath.Ext(file.Name()) == ".desktop" {
 				f, err := os.Open(filepath.Join(dir, file.Name()))
-				if errors.Is(err, os.ErrNotExist) {
+				if err != nil {
+					fmt.Println("desktop file error:", err)
 					continue
 				}
 				entry, err := desktop.New(f)
 				if err != nil {
-					fmt.Println("entry", err, f.Name())
-					return err
+					fmt.Println("desktop parse error:", err, file.Name())
+					continue
 				}
 				desktops[entry.StartupWMClass] = entry.Icon
 			}
 		}
 	}
-	return nil
 }
