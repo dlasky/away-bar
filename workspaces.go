@@ -54,7 +54,10 @@ func getName(node *sway.Node) string {
 		fmt.Println(*node.AppID)
 		return *node.AppID
 	} else if node.WindowProperties != nil {
-		fmt.Println(node.WindowProperties.Instance)
+		name, ok := desktops[node.WindowProperties.Class]
+		if ok {
+			return name
+		}
 		return node.WindowProperties.Instance
 	}
 	fmt.Println("didnt find name")

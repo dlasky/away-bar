@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -36,20 +37,22 @@ func cacheDesktops() error {
 
 	for _, dir := range dataDirs {
 		files, err := os.ReadDir(dir)
-		if err != nil {
-			return err
+		if errors.Is(err, os.ErrExist) {
+			continue
 		}
 		for _, file := range files {
-			fmt.Println(filepath.FromSlash(filepath.Join(dir, file.Name())))
-			f, err := os.Open(filepath.Join(dir, file.Name()))
-			if err != nil {
-				return err
+			if filepath.Ext(file.Name()) == ".desktop" {
+				f, err := os.Open(filepath.Join(dir, file.Name()))
+				if errors.Is(err, os.ErrNotExist) {
+					continue
+				}
+				entry, err := desktop.New(f)
+				if err != nil {
+					fmt.Println("entry", err, f.Name())
+					return err
+				}
+				desktops[entry.StartupWMClass] = entry.Icon
 			}
-			entry, err := desktop.New(f)
-			if err != nil {
-				return err
-			}
-			desktops[entry.StartupWMClass] = entry.Icon
 		}
 	}
 	return nil
