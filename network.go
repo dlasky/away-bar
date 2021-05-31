@@ -1,24 +1,24 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/Wifx/gonetworkmanager"
 	"github.com/gotk3/gotk3/gtk"
 )
 
 func InitNetwork() (gtk.IWidget, error) {
-	/* Create new instance of gonetworkmanager */
+
 	nm, err := gonetworkmanager.NewNetworkManager()
 	if err != nil {
 		return nil, err
 	}
 
-	/* Get devices */
 	devices, err := nm.GetPropertyAllDevices()
 	if err != nil {
 		return nil, err
 	}
 
-	/* Show each device path and interface name */
 	for _, device := range devices {
 
 		state, err := device.GetPropertyState()
@@ -26,7 +26,21 @@ func InitNetwork() (gtk.IWidget, error) {
 			return nil, err
 		}
 		if state == gonetworkmanager.NmDeviceStateActivated {
-
+			path := device.GetPath()
+			name, err := device.GetPropertyInterface()
+			if err != nil {
+				return nil, err
+			}
+			fmt.Println(path, name)
+			typ, err := device.GetPropertyDeviceType()
+			if err != nil {
+				return nil, err
+			}
+			switch typ {
+			case gonetworkmanager.NmDeviceTypeEthernet:
+			case gonetworkmanager.NmDeviceTypeWifi:
+			case gonetworkmanager.NmDeviceTypeTun:
+			}
 		}
 
 		// byt, err := device.MarshalJSON()
