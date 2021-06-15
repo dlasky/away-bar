@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"time"
 
 	"github.com/gotk3/gotk3/gtk"
@@ -19,7 +18,7 @@ func InitTemp() (gtk.IWidget, error) {
 		for {
 			temps, err := host.SensorsTemperatures()
 			if err != nil {
-				log.Fatal("error getting temps")
+				module.error(err)
 			}
 			module.Render(temps)
 			time.Sleep(5 * time.Second)

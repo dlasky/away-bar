@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"text/template"
 
 	"github.com/gotk3/gotk3/glib"
@@ -17,6 +18,12 @@ type Module struct {
 	templateRaw string
 	template    *template.Template
 }
+
+// type ModuleRender func(*gtk.Box, error)
+
+// func RegisterModule(typ string, render ModuleRender) {
+
+// }
 
 func NewModule(name string, templateRaw string, iconPath string) (*Module, error) {
 
@@ -73,4 +80,8 @@ func (l *Module) Render(value interface{}) error {
 
 func (l *Module) error(err error) {
 	fmt.Printf("[%v]: %v\n", l.name, err)
+}
+
+func (l *Module) fatal(err error) {
+	log.Fatalf("[%v]: %v\n", l.name, err)
 }
