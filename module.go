@@ -10,6 +10,11 @@ import (
 	"github.com/gotk3/gotk3/gtk"
 )
 
+type IModule interface {
+	GetWidget() gtk.IWidget
+	Render(value interface{}) error
+}
+
 type Module struct {
 	name        string
 	label       *gtk.Label

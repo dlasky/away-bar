@@ -24,5 +24,5 @@ func InitTemp() (gtk.IWidget, error) {
 			time.Sleep(5 * time.Second)
 		}
 	}()
-	return module.box, nil
+	return module.GetWidget(), nil
 }
