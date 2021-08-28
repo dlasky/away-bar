@@ -63,22 +63,23 @@ func main() {
 	}
 	b.Add(ws)
 
-	clock, err := InitClock("3:04 PM")
+	clock, err := InitClock("3:04 PM", "01/02/2006")
 	if err != nil {
-		log.Fatal("ui error")
+		log.Fatal("ui clock error", err)
 	}
 	b.Add(clock)
 
 	cpu, err := InitCPU()
 	if err != nil {
-		log.Fatal("ui error")
+		log.Fatal("ui error", err)
 	}
 	b.Add(cpu)
-	mem, err := InitMem()
-	if err != nil {
-		log.Fatal("ui error")
-	}
-	b.Add(mem)
+
+	// mem, err := InitMem()
+	// if err != nil {
+	// 	log.Fatal("ui error")
+	// }
+	// b.Add(mem)
 
 	InitNetwork()
 

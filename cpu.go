@@ -2,36 +2,47 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"time"
 
-	"github.com/gotk3/gotk3/glib"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/shirou/gopsutil/v3/cpu"
 )
 
+type CpuData struct {
+	Percent string
+	Info    cpu.InfoStat
+}
+
 func InitCPU() (gtk.IWidget, error) {
 
-	cpuLabel, err := gtk.LabelNew("cpu")
+	module, err := NewModule("cpu", "{{.Percent}}", "{{.Info.ModelName}}", "./feather/cpu.svg")
 	if err != nil {
 		return nil, err
 	}
 
+	info, err := cpu.Info()
+	spew.Dump(info)
+	if err != nil {
+		module.error(err)
+	}
+
 	go func() {
 		for {
+
 			c, err := cpu.Percent(5*time.Second, false)
 			if err != nil {
-				log.Fatal("cpu fetch error")
+				module.error(err)
 			}
 
-			s := fmt.Sprintf("cpu: %.0f %%", c[0])
-			_, err = glib.IdleAdd(cpuLabel.SetText, s)
-			if err != nil {
-				log.Fatal("IdleAdd() failed:", err)
+			data := CpuData{
+				Percent: fmt.Sprintf("cpu: %.0f %%", c[0]),
+				Info:    info[0],
 			}
+			module.Render(data)
 			time.Sleep(5 * time.Second)
 		}
 	}()
 
-	return cpuLabel, nil
+	return module.GetWidget(), nil
 }

@@ -2,65 +2,50 @@ package main
 
 import (
 	"fmt"
-	"log"
 
-	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/lawl/pulseaudio"
 )
 
+type VolumeData struct {
+	Volume string
+	Muted  string
+}
+
 func InitPulseAudio() (gtk.IWidget, error) {
-	client, err := pulseaudio.NewClient()
+
+	module, err := NewModule("volume", "{{.Volume}} %", "", "./feather/speaker.svg")
 	if err != nil {
 		return nil, err
 	}
 
-	volLabel, err := gtk.LabelNew("volume")
+	client, err := pulseaudio.NewClient()
 	if err != nil {
-		return nil, err
+		module.error(err)
 	}
 
 	go func() {
 		cha, _ := client.Updates()
 		vol, err := client.Volume()
 		if err != nil {
-			log.Fatal("pulse issue")
+			module.error(err)
 		}
-		s := fmt.Sprintf("vol: %.0f %%", vol*100)
-		_, err = glib.IdleAdd(volLabel.SetText, s)
-		if err != nil {
-			log.Fatal("IdleAdd() failed:", err)
-		}
+		data := VolumeData{Volume: fmt.Sprintf("%.0f", vol*100)}
+		module.Render(data)
 		go func() {
 			for {
 				<-cha
 				vol, err := client.Volume()
 				if err != nil {
-					log.Fatal("pulse issue")
+					module.error(err)
 				}
-				s := fmt.Sprintf("vol: %.0f %%", vol*100)
-				_, err = glib.IdleAdd(volLabel.SetText, s)
-				if err != nil {
-					log.Fatal("IdleAdd() failed:", err)
+				data := VolumeData{
+					Volume: fmt.Sprintf("%.0f", vol*100),
 				}
+				module.Render(data)
 			}
 		}()
 	}()
 
-	// go func() {
-	// 	for {
-	// 		vol, err := client.Volume()
-	// 		if err != nil {
-	// 			log.Fatal("pulse issue")
-	// 		}
-	// 		s := fmt.Sprintf("vol: %.0f %%", vol*100)
-	// 		_, err = glib.IdleAdd(volLabel.SetText, s)
-	// 		if err != nil {
-	// 			log.Fatal("IdleAdd() failed:", err)
-	// 		}
-	// 		time.Sleep(5 * time.Second)
-	// 	}
-	// }()
-
-	return volLabel, nil
+	return module.GetWidget(), nil
 }

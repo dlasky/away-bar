@@ -16,21 +16,17 @@ type IModule interface {
 }
 
 type Module struct {
-	name        string
-	label       *gtk.Label
-	box         *gtk.Box
-	icon        *gtk.Image
-	templateRaw string
-	template    *template.Template
+	name            string
+	label           *gtk.Label
+	box             *gtk.Box
+	icon            *gtk.Image
+	templateRaw     string
+	template        *template.Template
+	tooltipRaw      string
+	tooltipTemplate *template.Template
 }
 
-// type ModuleRender func(*gtk.Box, error)
-
-// func RegisterModule(typ string, render ModuleRender) {
-
-// }
-
-func NewModule(name string, templateRaw string, iconPath string) (*Module, error) {
+func NewModule(name string, templateRaw string, tooltipTemplate string, iconPath string) (*Module, error) {
 
 	box, err := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL, 0)
 	if err != nil {
@@ -55,16 +51,25 @@ func NewModule(name string, templateRaw string, iconPath string) (*Module, error
 	t := template.New(name)
 	tmp, err := t.Parse(templateRaw)
 	if err != nil {
+		fmt.Println("compile error")
+		return nil, err
+	}
+
+	t2 := template.New(name)
+	tmp2, err := t2.Parse(tooltipTemplate)
+	if err != nil {
 		return nil, err
 	}
 
 	return &Module{
-		name:        name,
-		label:       label,
-		icon:        icon,
-		box:         box,
-		templateRaw: templateRaw,
-		template:    tmp,
+		name:            name,
+		label:           label,
+		icon:            icon,
+		box:             box,
+		templateRaw:     templateRaw,
+		template:        tmp,
+		tooltipRaw:      tooltipTemplate,
+		tooltipTemplate: tmp2,
 	}, nil
 }
 
@@ -73,14 +78,31 @@ func (l *Module) GetWidget() gtk.IWidget {
 }
 
 func (l *Module) Render(value interface{}) error {
-	b := bytes.NewBuffer([]byte{})
-	err := l.template.Execute(b, value)
+	text, err := render(*l.template, value)
+	if err != nil {
+		fmt.Println("render error")
+		return err
+	}
+	tooltip, err := render(*l.tooltipTemplate, value)
 	if err != nil {
 		return err
 	}
-	s := b.String()
-	_, err = glib.IdleAdd(l.label.SetText, s)
+
+	glib.IdleAdd(func() bool {
+		l.label.SetText(text)
+		l.box.SetTooltipText(tooltip)
+		return false
+	})
 	return err
+}
+
+func render(tmp template.Template, value interface{}) (string, error) {
+	b := bytes.NewBuffer([]byte{})
+	err := tmp.Execute(b, value)
+	if err != nil {
+		return "", err
+	}
+	return b.String(), nil
 }
 
 func (l *Module) error(err error) {

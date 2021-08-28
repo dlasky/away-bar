@@ -9,7 +9,7 @@ import (
 
 func InitTemp() (gtk.IWidget, error) {
 
-	module, err := NewModule("temperature", "temp: {{(index . 0).Temperature}}C", "./feather/thermometer.svg")
+	module, err := NewModule("temperature", "temp: {{(index . 0).Temperature}}°C", "{{(index . 0).Temperature}}°C", "./feather/thermometer.svg")
 	if err != nil {
 		return nil, err
 	}
