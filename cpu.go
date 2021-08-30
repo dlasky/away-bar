@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/shirou/gopsutil/v3/cpu"
 )
@@ -22,7 +21,6 @@ func InitCPU() (gtk.IWidget, error) {
 	}
 
 	info, err := cpu.Info()
-	spew.Dump(info)
 	if err != nil {
 		module.error(err)
 	}

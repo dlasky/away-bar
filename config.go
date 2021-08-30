@@ -35,6 +35,7 @@ func setupFromConfig(bar *gtk.Box) error {
 	for _, module := range data.Modules {
 		//TODO: replace this with a registration map
 		switch module.Type {
+		case "":
 
 		}
 

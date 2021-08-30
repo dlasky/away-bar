@@ -9,6 +9,11 @@ import (
 
 func InitNetwork() (gtk.IWidget, error) {
 
+	module, err := NewModule("network", "", "", "./feather/wifi.svg")
+	if err != nil {
+		return nil, err
+	}
+
 	nm, err := gonetworkmanager.NewNetworkManager()
 	if err != nil {
 		return nil, err
@@ -38,8 +43,11 @@ func InitNetwork() (gtk.IWidget, error) {
 			}
 			switch typ {
 			case gonetworkmanager.NmDeviceTypeEthernet:
+
 			case gonetworkmanager.NmDeviceTypeWifi:
+
 			case gonetworkmanager.NmDeviceTypeTun:
+
 			}
 		}
 
@@ -55,5 +63,5 @@ func InitNetwork() (gtk.IWidget, error) {
 
 		// fmt.Println(deviceInterface + " - " + string(device.GetPath()))
 	}
-	return nil, nil
+	return module.GetWidget(), nil
 }
