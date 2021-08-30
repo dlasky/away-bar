@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/dlasky/gotk3-layershell/layershell"
@@ -75,19 +76,19 @@ func main() {
 	}
 	b.Add(cpu)
 
-	// mem, err := InitMem()
-	// if err != nil {
-	// 	log.Fatal("ui error")
-	// }
-	// b.Add(mem)
+	mem, err := InitMem()
+	if err != nil {
+		log.Fatal("ui error")
+	}
+	b.Add(mem)
 
 	InitNetwork()
 
-	// bat, err := InitBattery()
-	// if err != nil {
-	// 	fmt.Printf("[battery] %v", err)
-	// }
-	// b.Add(bat)
+	bat, err := InitBattery()
+	if err != nil {
+		fmt.Printf("[battery] %v", err)
+	}
+	b.Add(bat)
 
 	temp, err := InitTemp()
 	if err != nil {
