@@ -1,7 +1,11 @@
 package main
 
 import (
+	"context"
+	"fmt"
+
 	"github.com/gotk3/gotk3/gtk"
+	"github.com/joshuarubin/go-sway"
 )
 
 type WorkspaceBox struct {
@@ -13,6 +17,7 @@ type WorkspaceBox struct {
 type Workspace struct {
 	ID    int64
 	Name  string
+	EBox  *gtk.EventBox
 	Box   *gtk.Box
 	Label *gtk.Label
 	Apps  map[int64]*gtk.Image
@@ -31,10 +36,24 @@ func NewWorkspaceBox() (*WorkspaceBox, error) {
 
 func (w *WorkspaceBox) Add(name string, ID int64) error {
 
+	ebox, err := gtk.EventBoxNew()
+	if err != nil {
+		return err
+	}
+	ebox.Connect("button-release-event", func() {
+		bg := context.Background()
+		client, err := sway.New(bg)
+		if err != nil {
+			fmt.Println(err)
+		}
+		client.RunCommand(bg, "workspace "+name)
+	})
+
 	box, err := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL, 0)
 	if err != nil {
 		return err
 	}
+	ebox.Add(box)
 	label, err := gtk.LabelNew(name)
 	if err != nil {
 		return err
@@ -44,6 +63,7 @@ func (w *WorkspaceBox) Add(name string, ID int64) error {
 	ws := Workspace{
 		ID,
 		name,
+		ebox,
 		box,
 		label,
 		map[int64]*gtk.Image{},
@@ -55,7 +75,7 @@ func (w *WorkspaceBox) Add(name string, ID int64) error {
 	}
 	ctx.AddClass("workspace")
 
-	w.box.Add(box)
+	w.box.Add(ebox)
 	w.box.ShowAll()
 	w.list[ID] = ws
 	return nil
@@ -63,8 +83,10 @@ func (w *WorkspaceBox) Add(name string, ID int64) error {
 
 func (w *WorkspaceBox) Remove(ID int64) {
 	if wsb, ok := w.list[ID]; ok {
-		w.box.Remove(wsb.Box)
+		w.box.Remove(wsb.EBox)
+		wsb.EBox.Destroy()
 		wsb.Box.Destroy()
+		//todo clear apps as well?
 		delete(w.list, ID)
 	}
 }
@@ -108,6 +130,9 @@ func (w *WorkspaceBox) AddApplication(name string, ID int64, parentID int64) err
 		if err != nil {
 			return err
 		}
+		img.Connect("clicked", func() {
+			fmt.Println("clicked")
+		})
 		ws.Apps[ID] = img
 		ws.Box.Add(img)
 		ws.Box.ShowAll()
