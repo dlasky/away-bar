@@ -1,6 +1,12 @@
+.bar {
+  background: black;
+  color: white;
+}
+
 .workspace {
   color: green;
   background: black;
+  padding: 4px 2px;
 }
 
 .workspace.focused {

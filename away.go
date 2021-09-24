@@ -58,9 +58,15 @@ func main() {
 		log.Fatal("ui error")
 	}
 
+	sctx, err := b.GetStyleContext()
+	if err != nil {
+		fmt.Printf("css err: %v", err)
+	}
+	sctx.AddClass("bar")
+
 	ws, err := InitWorkspaces()
 	if err != nil {
-		log.Fatal("ui error")
+		fmt.Printf("workspaces error %v", err)
 	}
 	b.Add(ws)
 

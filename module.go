@@ -33,6 +33,13 @@ func NewModule(name string, templateRaw string, tooltipTemplate string, iconPath
 		return nil, err
 	}
 
+	ctx, err := box.GetStyleContext()
+	if err != nil {
+		return nil, err
+	}
+	ctx.AddClass("module")
+	ctx.AddClass(name)
+
 	label, err := gtk.LabelNew("")
 	if err != nil {
 		return nil, err
