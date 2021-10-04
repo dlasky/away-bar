@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/rkoesters/xdg/desktop"
 )
 
@@ -53,7 +54,10 @@ func cacheDesktops() {
 					continue
 				}
 				desktops[entry.StartupWMClass] = entry.Icon
+				desktops[entry.Exec] = entry.Icon
+				desktops[entry.Name] = entry.Icon
 			}
 		}
 	}
+	spew.Dump(desktops)
 }
