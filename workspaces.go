@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/joshuarubin/go-sway"
 )
@@ -15,6 +14,8 @@ type WSEHandler struct {
 	wbox   *WorkspaceBox
 	client sway.Client
 }
+
+var tree *sway.Node
 
 func (wse WSEHandler) Workspace(ctx context.Context, ev sway.WorkspaceEvent) {
 	switch ev.Change {
@@ -29,21 +30,26 @@ func (wse WSEHandler) Workspace(ctx context.Context, ev sway.WorkspaceEvent) {
 }
 
 func (wse WSEHandler) Window(ctx context.Context, ev sway.WindowEvent) {
+	fmt.Println("change", ev.Change)
 	switch ev.Change {
 	case "new":
 		root, err := wse.client.GetTree(ctx)
-		if err == nil {
-			id, ok := findParentWorkspace(root, nil, &ev.Container)
-			if ok {
-				wse.wbox.AddApplication(getName(&ev.Container), ev.Container.ID, id)
+		if err != nil {
+			fmt.Println("tree error", err)
+		}
+		tree = root
+		list := traverse(root, 0)
+		for _, app := range list {
+			if ev.Container.ID == app.ID {
+				wse.wbox.AddApplication(app.name, app.ID, app.parentID)
 			}
 		}
 	case "close":
-		root, err := wse.client.GetTree(ctx)
-		if err == nil {
-			id, ok := findParentWorkspace(root, nil, &ev.Container)
-			if ok {
-				wse.wbox.RemoveApplication(id, ev.Container.ID)
+		list := traverse(tree, 0)
+		for _, app := range list {
+			fmt.Println("rm", ev.Container.ID, app.ID, app.parentID)
+			if ev.Container.ID == app.ID {
+				wse.wbox.RemoveApplication(ev.Container.ID, app.parentID)
 			}
 		}
 	}
@@ -51,7 +57,7 @@ func (wse WSEHandler) Window(ctx context.Context, ev sway.WindowEvent) {
 
 func getName(node *sway.Node) string {
 	if node.AppID != nil {
-		fmt.Println(*node.AppID)
+		fmt.Println(node.AppID)
 		return *node.AppID
 	} else if node.WindowProperties != nil {
 		name, ok := desktops[node.WindowProperties.Class]
@@ -60,23 +66,8 @@ func getName(node *sway.Node) string {
 		}
 		return node.WindowProperties.Instance
 	}
-	fmt.Println("didnt find name")
-	spew.Dump(node)
+	fmt.Println("didnt find name", node.AppID)
 	return ""
-}
-
-func findParentWorkspace(root *sway.Node, parent *sway.Node, target *sway.Node) (int64, bool) {
-	if root.ID == target.ID {
-		return parent.ID, true
-	} else {
-		for _, n := range root.Nodes {
-			id, ok := findParentWorkspace(n, root, target)
-			if ok {
-				return id, ok
-			}
-		}
-	}
-	return 0, false
 }
 
 func InitWorkspaces() (gtk.IWidget, error) {
@@ -108,12 +99,9 @@ func InitWorkspaces() (gtk.IWidget, error) {
 	if err != nil {
 		log.Fatal("Could not get sway window tree is sway running?")
 	}
-	for _, display := range root.Nodes {
-		for _, ws := range display.Nodes {
-			for _, app := range ws.Nodes {
-				wbox.AddApplication(getName(app), app.ID, ws.ID)
-			}
-		}
+	apps := traverse(root, 0)
+	for _, app := range apps {
+		wbox.AddApplication(app.name, app.ID, app.parentID)
 	}
 
 	go func() {
@@ -125,4 +113,30 @@ func InitWorkspaces() (gtk.IWidget, error) {
 	}()
 
 	return wbox.box, nil
+}
+
+type WorkspaceLeaf struct {
+	name     string
+	ID       int64
+	parentID int64
+}
+
+func traverse(n *sway.Node, wsID int64) []WorkspaceLeaf {
+	if n.Type == "workspace" {
+		wsID = n.ID
+	}
+	if len(n.Nodes) == 0 {
+		return []WorkspaceLeaf{
+			{
+				name:     getName(n),
+				ID:       n.ID,
+				parentID: wsID,
+			},
+		}
+	}
+	var output = []WorkspaceLeaf{}
+	for _, node := range n.Nodes {
+		output = append(output, traverse(node, wsID)...)
+	}
+	return output
 }

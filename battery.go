@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/distatus/battery"
@@ -24,7 +23,7 @@ func InitBattery() (gtk.IWidget, error) {
 		for {
 			batData, err := battery.Get(0)
 			if err != nil {
-				log.Fatal(err)
+				fmt.Println("[battery]", err)
 			}
 			data := BatteryData{
 				Percent: fmt.Sprintf("bat: %.0f %%", batData.Current/batData.Full*100),

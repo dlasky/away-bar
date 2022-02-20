@@ -36,6 +36,8 @@ func NewWorkspaceBox() (*WorkspaceBox, error) {
 
 func (w *WorkspaceBox) Add(name string, ID int64) error {
 
+	fmt.Println("Add", name, ID)
+
 	ebox, err := gtk.EventBoxNew()
 	if err != nil {
 		return err
@@ -82,6 +84,9 @@ func (w *WorkspaceBox) Add(name string, ID int64) error {
 }
 
 func (w *WorkspaceBox) Remove(ID int64) {
+
+	fmt.Println("remove", ID)
+
 	if wsb, ok := w.list[ID]; ok {
 		w.box.Remove(wsb.EBox)
 		wsb.EBox.Destroy()
@@ -125,6 +130,7 @@ func setButtonFocus(btn *gtk.Box, focus bool) error {
 }
 
 func (w *WorkspaceBox) AddApplication(name string, ID int64, parentID int64) error {
+	fmt.Println("AddApplication", name, ID, parentID)
 	if ws, ok := w.list[parentID]; ok {
 		img, err := gtk.ImageNewFromIconName(name, gtk.ICON_SIZE_MENU)
 		if err != nil {
@@ -137,11 +143,17 @@ func (w *WorkspaceBox) AddApplication(name string, ID int64, parentID int64) err
 		ws.Box.Add(img)
 		ws.Box.ShowAll()
 		return nil
+	} else {
+		fmt.Println("no parent for", ID, parentID)
+		for k := range w.list {
+			fmt.Println(k)
+		}
 	}
 	return nil
 }
 
 func (w *WorkspaceBox) RemoveApplication(ID int64, parentID int64) {
+	fmt.Println("removeApplication", ID, parentID)
 	if ws, ok := w.list[parentID]; ok {
 		if img, ok := ws.Apps[ID]; ok {
 			ws.Box.Remove(img)
