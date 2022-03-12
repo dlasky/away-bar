@@ -7,9 +7,13 @@ import (
 	"github.com/gotk3/gotk3/gtk"
 )
 
+type NetworkData struct {
+	Connection string
+}
+
 func InitNetwork() (gtk.IWidget, error) {
 
-	module, err := NewModule("network", "", "", "./feather/wifi.svg")
+	module, err := NewModule("network", "{{.Connection}}", "", "./feather/wifi.svg")
 	if err != nil {
 		return nil, err
 	}
@@ -43,11 +47,14 @@ func InitNetwork() (gtk.IWidget, error) {
 			}
 			switch typ {
 			case gonetworkmanager.NmDeviceTypeEthernet:
-
+				data := NetworkData{Connection: "wired"}
+				module.Render(data)
 			case gonetworkmanager.NmDeviceTypeWifi:
-
+				data := NetworkData{Connection: "wifi"}
+				module.Render(data)
 			case gonetworkmanager.NmDeviceTypeTun:
-
+				data := NetworkData{Connection: "vpn"}
+				module.Render(data)
 			}
 		}
 

@@ -88,7 +88,11 @@ func main() {
 	}
 	b.Add(mem)
 
-	InitNetwork()
+	net, err := InitNetwork()
+	if err != nil {
+		fmt.Println("net error:", err)
+	}
+	b.Add(net)
 
 	bat, err := InitBattery()
 	if err != nil {
