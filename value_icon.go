@@ -10,22 +10,31 @@ type ImageValue struct {
 
 type ValueIcon struct {
 	values []ImageValue
-	img    *gtk.Image
+	image  *gtk.Image
 }
 
-func NewValueIcon(values []ImageValue) (*gtk.Image, error) {
+func NewValueIcon(values []ImageValue) (*ValueIcon, error) {
 	img, err := gtk.ImageNewFromResource("")
 	if err != nil {
 		return nil, err
 	}
 	img.SetFromFile(values[0].path)
-	return img, nil
+	v := &ValueIcon{
+		values: values,
+		image:  img,
+	}
+	return v, nil
 }
 
-func (v *ValueIcon) Render(value float64) {
+func (v *ValueIcon) Render(value float64) error {
 	for _, val := range v.values {
 		if value >= val.min && value <= val.max {
-			v.img.SetFromFile(val.path)
+			v.image.SetFromFile(val.path)
 		}
 	}
+	return nil
+}
+
+func (v *ValueIcon) GetWidget() gtk.IWidget {
+	return v.image
 }

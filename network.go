@@ -1,19 +1,20 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/Wifx/gonetworkmanager"
 	"github.com/gotk3/gotk3/gtk"
 )
 
 type NetworkData struct {
-	Connection string
+	Connection  string
+	Name        string
+	IP          string
+	NetworkName string
 }
 
 func InitNetwork() (gtk.IWidget, error) {
 
-	module, err := NewModule("network", "{{.Connection}}", "", "./feather/wifi.svg")
+	module, err := NewModule("network", "{{.Connection}}", "{{.IP}}", "./feather/wifi.svg")
 	if err != nil {
 		return nil, err
 	}
@@ -35,25 +36,46 @@ func InitNetwork() (gtk.IWidget, error) {
 			return nil, err
 		}
 		if state == gonetworkmanager.NmDeviceStateActivated {
-			path := device.GetPath()
 			name, err := device.GetPropertyInterface()
 			if err != nil {
 				return nil, err
 			}
-			fmt.Println(path, name)
+			ipConfig, err := device.GetPropertyIP4Config()
+			if err != nil {
+				return nil, err
+			}
+			ip, err := ipConfig.GetPropertyAddressData()
+			if err != nil {
+				return nil, err
+			}
+
 			typ, err := device.GetPropertyDeviceType()
 			if err != nil {
 				return nil, err
 			}
 			switch typ {
 			case gonetworkmanager.NmDeviceTypeEthernet:
-				data := NetworkData{Connection: "wired"}
+				data := NetworkData{
+					Connection: "wired",
+					Name:       name,
+					IP:         ip[0].Address,
+				}
 				module.Render(data)
 			case gonetworkmanager.NmDeviceTypeWifi:
-				data := NetworkData{Connection: "wifi"}
+				data := NetworkData{
+					Connection:  "wifi",
+					Name:        name,
+					IP:          ip[0].Address,
+					NetworkName: "",
+				}
+
 				module.Render(data)
 			case gonetworkmanager.NmDeviceTypeTun:
-				data := NetworkData{Connection: "vpn"}
+				data := NetworkData{
+					Connection: "vpn",
+					Name:       name,
+					IP:         ip[0].Address,
+				}
 				module.Render(data)
 			}
 		}
