@@ -16,6 +16,10 @@ func NewTypeIcon(config map[string]string, initial string) (*TypeIcon, error) {
 	if err != nil {
 		return nil, err
 	}
+	return TypeIconFromImage(img, config, initial)
+}
+
+func TypeIconFromImage(img *gtk.Image, config map[string]string, initial string) (*TypeIcon, error) {
 	val, ok := config[initial]
 	if ok {
 		img.SetFromFile(val)

@@ -18,6 +18,10 @@ func NewValueIcon(values []ImageValue) (*ValueIcon, error) {
 	if err != nil {
 		return nil, err
 	}
+	return ValueIconFromImage(img, values)
+}
+
+func ValueIconFromImage(img *gtk.Image, values []ImageValue) (*ValueIcon, error) {
 	img.SetFromFile(values[0].path)
 	v := &ValueIcon{
 		values: values,
