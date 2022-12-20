@@ -40,6 +40,14 @@ func main() {
 		gtk.MainQuit()
 	})
 
+	config, err := getConfig()
+	if err != nil {
+		log.Fatalf("config error %v", err)
+
+	}
+
+	fmt.Println(config)
+
 	layershell.InitForWindow(win)
 
 	layershell.SetAnchor(win, layershell.LAYER_SHELL_EDGE_LEFT, true)
@@ -64,53 +72,55 @@ func main() {
 	}
 	sctx.AddClass("bar")
 
-	ws, err := InitWorkspaces()
-	if err != nil {
-		fmt.Printf("workspaces error %v", err)
-	}
-	b.Add(ws)
+	setupFromConfig(b, config)
 
-	clock, err := InitClock("3:04 PM", "01/02/2006")
-	if err != nil {
-		log.Fatal("ui clock error", err)
-	}
-	b.Add(clock)
+	// ws, err := InitWorkspaces()
+	// if err != nil {
+	// 	fmt.Printf("workspaces error %v", err)
+	// }
+	// b.Add(ws)
 
-	cpu, err := InitCPU()
-	if err != nil {
-		log.Fatal("ui error", err)
-	}
-	b.Add(cpu)
+	// clock, err := InitClock("3:04 PM", "01/02/2006")
+	// if err != nil {
+	// 	log.Fatal("ui clock error", err)
+	// }
+	// b.Add(clock)
 
-	mem, err := InitMem()
-	if err != nil {
-		log.Fatal("ui error")
-	}
-	b.Add(mem)
+	// cpu, err := InitCPU()
+	// if err != nil {
+	// 	log.Fatal("ui error", err)
+	// }
+	// b.Add(cpu)
 
-	net, err := InitNetwork()
-	if err != nil {
-		fmt.Println("net error:", err)
-	}
-	b.Add(net)
+	// mem, err := InitMem()
+	// if err != nil {
+	// 	log.Fatal("ui error")
+	// }
+	// b.Add(mem)
 
-	bat, err := InitBattery()
-	if err != nil {
-		fmt.Printf("[battery] %v", err)
-	}
-	b.Add(bat)
+	// net, err := InitNetwork()
+	// if err != nil {
+	// 	fmt.Println("net error:", err)
+	// }
+	// b.Add(net)
 
-	temp, err := InitTemp()
-	if err != nil {
-		log.Fatal("ui error", err)
-	}
-	b.Add(temp)
+	// bat, err := InitBattery()
+	// if err != nil {
+	// 	fmt.Printf("[battery] %v", err)
+	// }
+	// b.Add(bat)
 
-	vol, err := InitPulseAudio()
-	if err != nil {
-		log.Fatal("ui error")
-	}
-	b.Add(vol)
+	// temp, err := InitTemp()
+	// if err != nil {
+	// 	log.Fatal("ui error", err)
+	// }
+	// b.Add(temp)
+
+	// vol, err := InitPulseAudio()
+	// if err != nil {
+	// 	log.Fatal("ui error")
+	// }
+	// b.Add(vol)
 
 	win.Add(b)
 	// Set the default window size.

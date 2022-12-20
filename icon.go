@@ -5,6 +5,14 @@ import (
 	"github.com/gotk3/gotk3/gtk"
 )
 
+type IconType string
+
+const (
+	Static IconType = "static"
+	Value           = "value"
+	Range           = "range"
+)
+
 func InitIcon(name string) (*gtk.Image, error) {
 	icon, err := glib.IconNewForString(name)
 	if err != nil {

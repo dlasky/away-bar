@@ -14,7 +14,11 @@
             "name":"temperature",
             "type":"temperature",
             "output":"temp: {{(index . 0).Temperature}}°C",
-            "icon":"./feather/thermometer.svg"
+            "icon":"./feather/thermometer.svg",
+            "rangeIcon": {
+                "./feather/thermometer.svg": [0,10],
+                "./feather/thermometer-full.svg": [10,20]
+            }
         },
         {
             "name": "spacer",

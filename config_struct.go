@@ -20,3 +20,9 @@ type Modules struct {
 	Output           string `json:"output,omitempty"`
 	Icon             string `json:"icon,omitempty"`
 }
+
+type Clock struct {
+	*Modules
+	TimeFormat string `json:"time_format"`
+	DateFormat string `json:"date_format"`
+}

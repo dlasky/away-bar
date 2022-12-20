@@ -2,19 +2,23 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path"
 
 	"github.com/gotk3/gotk3/gtk"
 )
 
-//TODO: config json here
+// TODO: config json here
 func getConfig() (*ConfigData, error) {
-	home := getEnv("XDG_HOME", "~/")
+	home := getEnv("XDG_HOME", "/home/aerolith/")
 	config := getEnv("XDG_CONFIG", ".config")
 	conf := path.Join(home, config, "/away/config.json")
 
+	fmt.Printf("conf %v", conf)
+
 	data := &ConfigData{}
+	// var data interface{}
 
 	byt, err := os.ReadFile(conf)
 	if err != nil {
@@ -27,18 +31,33 @@ func getConfig() (*ConfigData, error) {
 	return data, nil
 }
 
-func setupFromConfig(bar *gtk.Box) error {
-	data, err := getConfig()
-	if err != nil {
-		return err
-	}
-	for _, module := range data.Modules {
+func setupFromConfig(bar *gtk.Box, config *ConfigData) error {
+	for _, module := range config.Modules {
+		fmt.Println("module", module.Name, module.Type)
 		//TODO: replace this with a registration map
 		switch module.Type {
-		case "":
+		case "workspaces":
+			mod, err := InitWorkspaces()
+			if err != nil {
+				fmt.Println(err)
+			}
+			bar.Add(mod.ToWidget())
+		case "backlight":
+			mod, err := InitBacklight()
+			if err != nil {
+				fmt.Println(err)
+			}
+			bar.Add(mod.ToWidget())
+
+		case "clock":
+			// mod, err := InitClock(module.timeFormat, module.dateFormat)
+			// if err != nil {
+
+			// }
+			// bar.Add(mod.ToWidget())
 
 		}
-
+		return nil
 	}
 	return nil
 }
