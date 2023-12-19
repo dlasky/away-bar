@@ -31,7 +31,7 @@ type ModuleWithRenderable struct {
 	renderable IModule
 }
 
-func NewModule(name string, templateRaw string, tooltipTemplate string, iconPath string) (*Module, error) {
+func getModuleBase(name string, templateRaw string, tooltipTemplate string, iconPath string) (*Module, error) {
 
 	box, err := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL, 0)
 	if err != nil {
@@ -85,16 +85,15 @@ func NewModule(name string, templateRaw string, tooltipTemplate string, iconPath
 	}, nil
 }
 
-func NewModuleWithStaticIcon() {
+func NewModule(name string, templateRaw string, tooltipTemplate string, iconPath string) (*Module, error) {
 
+	return getModuleBase(name, templateRaw, tooltipTemplate, iconPath)
 }
 
-func NewModuleWithValueIcon() {
+func NewModuleWithValueIcon(name string, templateRaw string, tooltipTemplate string, iconSettings map[int]string) (*Module, error) {
+	mod, err := getModuleBase(name, templateRaw, tooltipTemplate, "")
 
-}
-
-func NewModuleWithTypeIcon() {
-
+	return mod, err
 }
 
 func (l *Module) GetWidget() gtk.IWidget {

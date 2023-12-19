@@ -11,6 +11,10 @@ type ClockConfig struct {
 	TooltipFormat string `hcl:"tooltip,optional"`
 }
 
+func InitClockWithConfig(cfg ClockConfig) (gtk.IWidget, error) {
+	return InitClock(cfg.Format, cfg.TooltipFormat)
+}
+
 func InitClock(format string, tooltipFormat string) (gtk.IWidget, error) {
 
 	type ClockData struct {
