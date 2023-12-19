@@ -1,63 +1,43 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
+	"log"
 	"path"
 
 	"github.com/gotk3/gotk3/gtk"
+	"github.com/hashicorp/hcl/v2/hclsimple"
 )
 
-// TODO: config json here
-func getConfig() (*ConfigData, error) {
-	home := getEnv("XDG_HOME", "/home/aerolith/")
-	config := getEnv("XDG_CONFIG", ".config")
-	conf := path.Join(home, config, "/away/config.json")
+func getConfig() (*Config, error) {
+
+	//TODO: allow an explicit pathing here as well via flags
+
+	user := getEnv("USER", "")
+	home := getEnv("XDG_HOME", "/home/"+user)
+	cfg := getEnv("XDG_CONFIG", ".config")
+	conf := path.Join(home, cfg, "/awaybar/config.hcl")
 
 	fmt.Printf("conf %v", conf)
 
-	data := &ConfigData{}
-	// var data interface{}
-
-	byt, err := os.ReadFile(conf)
+	var config Config
+	err := hclsimple.DecodeFile(conf, nil, &config)
 	if err != nil {
-		return nil, err
+		log.Fatalf("Failed to load configuration: %s", err)
 	}
-	err = json.Unmarshal(byt, data)
-	if err != nil {
-		return nil, err
-	}
-	return data, nil
+	log.Printf("Configuration is %#v", config)
+	return &config, err
 }
 
-func setupFromConfig(bar *gtk.Box, config *ConfigData) error {
-	for _, module := range config.Modules {
-		fmt.Println("module", module.Name, module.Type)
-		//TODO: replace this with a registration map
-		switch module.Type {
-		case "workspaces":
-			mod, err := InitWorkspaces()
-			if err != nil {
-				fmt.Println(err)
-			}
-			bar.Add(mod.ToWidget())
-		case "backlight":
-			mod, err := InitBacklight()
-			if err != nil {
-				fmt.Println(err)
-			}
-			bar.Add(mod.ToWidget())
+func setupFromConfig(bar *gtk.Box, config *Config) error {
 
-		case "clock":
-			// mod, err := InitClock(module.timeFormat, module.dateFormat)
-			// if err != nil {
-
-			// }
-			// bar.Add(mod.ToWidget())
-
+	if config.Bar.Clock != nil {
+		w, err := InitClock(config.Bar.Clock.Format, config.Bar.Clock.TooltipFormat)
+		if err != nil {
+			fmt.Println(err)
 		}
-		return nil
+		bar.Add(w.ToWidget())
 	}
+
 	return nil
 }

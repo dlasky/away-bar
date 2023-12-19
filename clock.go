@@ -6,6 +6,11 @@ import (
 	"github.com/gotk3/gotk3/gtk"
 )
 
+type ClockConfig struct {
+	Format        string `hcl:"format"`
+	TooltipFormat string `hcl:"tooltip,optional"`
+}
+
 func InitClock(format string, tooltipFormat string) (gtk.IWidget, error) {
 
 	type ClockData struct {

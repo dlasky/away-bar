@@ -1,28 +1,19 @@
 package main
 
-type ConfigData struct {
-	Bar     Bar       `json:"bar"`
-	Modules []Modules `json:"modules"`
-}
-type Margins struct {
-	Left  int `json:"left"`
-	Right int `json:"right"`
-}
-type Bar struct {
-	Position string  `json:"position"`
-	Margins  Margins `json:"margins"`
-	Display  string  `json:"display"`
-}
-type Modules struct {
-	Name             string `json:"name"`
-	Type             string `json:"type"`
-	Applicationicons bool   `json:"applicationIcons,omitempty"`
-	Output           string `json:"output,omitempty"`
-	Icon             string `json:"icon,omitempty"`
+type Config struct {
+	// LogLevel string `hcl:"log_level"`
+	Bar Bar `hcl:"bar,block"`
 }
 
-type Clock struct {
-	*Modules
-	TimeFormat string `json:"time_format"`
-	DateFormat string `json:"date_format"`
+type Bar struct {
+	Name  string       `hcl:"name"`
+	Clock *ClockConfig `hcl:"clock,block"`
+}
+
+type Image struct {
+	Path string `hcl:"path"`
+}
+
+type DynamicImage struct {
+	Ranges map[int]string `hcl:"ranges"`
 }
