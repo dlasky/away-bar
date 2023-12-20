@@ -3,6 +3,7 @@ package internal
 import (
 	"strconv"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 )
@@ -31,7 +32,8 @@ type IconConfig struct {
 }
 
 func NewIconFromConfig(cfg *IconConfig) (*Icon, error) {
-	if cfg.IconType == DynamicIcon {
+	spew.Dump(cfg)
+	if cfg.IconType == StaticIcon {
 		return NewStaticIcon(*cfg.Path)
 	}
 	return NewDynamicIcon(*cfg.Config, *cfg.ValueTemplate)
