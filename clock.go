@@ -1,28 +1,32 @@
 package main
 
 import (
+	"dlasky/away-bar/internal"
 	"time"
 
 	"github.com/gotk3/gotk3/gtk"
 )
 
 type ClockConfig struct {
-	Format        string `hcl:"format"`
-	TooltipFormat string `hcl:"tooltip,optional"`
+	Title         string               `hcl:"title,label"`
+	Format        string               `hcl:"format"`
+	TooltipFormat string               `hcl:"tooltip,optional"`
+	Icon          *internal.IconConfig `hcl:"icon,block"`
 }
 
 func InitClockWithConfig(cfg ClockConfig) (gtk.IWidget, error) {
-	return InitClock(cfg.Format, cfg.TooltipFormat)
-}
-
-func InitClock(format string, tooltipFormat string) (gtk.IWidget, error) {
 
 	type ClockData struct {
 		Value   string
 		Tooltip string
 	}
 
-	module, err := NewModule("clock", "{{.Value}}", "{{.Tooltip}}", "./feather/clock.svg")
+	module, err := internal.NewModuleFromConfig(&internal.ModuleConfig{
+		Name:    cfg.Title,
+		Format:  "{{.Value}}",
+		Tooltip: "{{.Tooltip}}",
+		Icon:    cfg.Icon,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -31,8 +35,8 @@ func InitClock(format string, tooltipFormat string) (gtk.IWidget, error) {
 		for {
 			t := time.Now()
 			d := ClockData{
-				Value:   t.Format(format),
-				Tooltip: t.Format(tooltipFormat),
+				Value:   t.Format(cfg.Format),
+				Tooltip: t.Format(cfg.TooltipFormat),
 			}
 
 			module.Render(d)

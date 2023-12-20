@@ -32,7 +32,7 @@ func getConfig() (*Config, error) {
 func setupFromConfig(bar *gtk.Box, config *Config) error {
 
 	if config.Bar.Clock != nil {
-		w, err := InitClock(config.Bar.Clock.Format, config.Bar.Clock.TooltipFormat)
+		w, err := InitClockWithConfig(*config.Bar.Clock)
 		if err != nil {
 			fmt.Println(err)
 		}

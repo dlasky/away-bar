@@ -1,6 +1,7 @@
 package main
 
 import (
+	"dlasky/away-bar/internal"
 	"fmt"
 	"time"
 
@@ -9,15 +10,16 @@ import (
 )
 
 type BatteryConfig struct {
+	*internal.ModuleConfig
 }
 
 type BatteryData struct {
 	Percent string
 }
 
-func InitBattery() (gtk.IWidget, error) {
+func InitBatteryWithConfig(cfg BatteryConfig) (gtk.IWidget, error) {
 
-	module, err := NewModule("battery", "{{.Percent}}", "", "./feather/battery.svg")
+	module, err := internal.NewModuleFromConfig(cfg.ModuleConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +31,7 @@ func InitBattery() (gtk.IWidget, error) {
 				fmt.Println("[battery]", err)
 			}
 			data := BatteryData{
-				Percent: fmt.Sprintf("bat: %.0f %%", batData.Current/batData.Full*100),
+				Percent: fmt.Sprintf("%.0f", batData.Current/batData.Full*100),
 			}
 			module.Render(data)
 			time.Sleep(60 * time.Second)

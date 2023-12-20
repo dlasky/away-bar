@@ -1,6 +1,7 @@
 package main
 
 import (
+	"dlasky/away-bar/internal"
 	"fmt"
 	"log"
 	"time"
@@ -9,12 +10,18 @@ import (
 	"github.com/shirou/gopsutil/v3/mem"
 )
 
+type MemConfig struct {
+	*internal.ModuleConfig
+	//TODO: internal
+}
 type MemData struct {
 	UsedPercent string
 }
 
-func InitMem() (gtk.IWidget, error) {
-	module, err := NewModule("memory", "{{.UsedPercent}}%", "", "./feather/box.svg")
+func InitMemFromConfig(cfg MemConfig) (gtk.IWidget, error) {
+
+	module, err := internal.NewModuleFromConfig(cfg.ModuleConfig)
+	// module, err := NewModule("memory", "{{.UsedPercent}}%", "", "./feather/box.svg")
 	if err != nil {
 		return nil, err
 	}

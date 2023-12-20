@@ -1,6 +1,7 @@
 package main
 
 import (
+	"dlasky/away-bar/internal"
 	"fmt"
 	"time"
 
@@ -8,21 +9,27 @@ import (
 	"github.com/shirou/gopsutil/v3/cpu"
 )
 
+type CPUConfig struct {
+	*internal.ModuleConfig
+	UpdateInterval int `hcl:"interval"`
+}
+
 type CpuData struct {
 	Percent string
 	Info    cpu.InfoStat
 }
 
-func InitCPU() (gtk.IWidget, error) {
+func InitCPUFromConfig(cfg CPUConfig) (gtk.IWidget, error) {
 
-	module, err := NewModule("cpu", "{{.Percent}}", "{{.Info.ModelName}}", "./feather/cpu.svg")
+	module, err := internal.NewModuleFromConfig(cfg.ModuleConfig)
+	// module, err := internal.NewModule("cpu", "{{.Percent}}", "{{.Info.ModelName}}", "./feather/cpu.svg")
 	if err != nil {
 		return nil, err
 	}
 
 	info, err := cpu.Info()
 	if err != nil {
-		module.error(err)
+		module.Error(err)
 	}
 
 	go func() {
@@ -30,7 +37,7 @@ func InitCPU() (gtk.IWidget, error) {
 
 			c, err := cpu.Percent(5*time.Second, false)
 			if err != nil {
-				module.error(err)
+				module.Error(err)
 			}
 
 			data := CpuData{
@@ -38,7 +45,7 @@ func InitCPU() (gtk.IWidget, error) {
 				Info:    info[0],
 			}
 			module.Render(data)
-			time.Sleep(5 * time.Second)
+			time.Sleep(time.Duration(cfg.UpdateInterval) * time.Second)
 		}
 	}()
 

@@ -1,9 +1,16 @@
 package main
 
 import (
+	"dlasky/away-bar/internal"
+
 	"github.com/Wifx/gonetworkmanager"
 	"github.com/gotk3/gotk3/gtk"
 )
+
+type NetworkConfig struct {
+	*internal.ModuleConfig
+	//TODO: loads more config here prolly
+}
 
 type NetworkData struct {
 	Connection  string
@@ -12,9 +19,10 @@ type NetworkData struct {
 	NetworkName string
 }
 
-func InitNetwork() (gtk.IWidget, error) {
+func InitNetworkFromConfig(cfg NetworkConfig) (gtk.IWidget, error) {
 
-	module, err := NewModule("network", "{{.Connection}}", "{{.IP}}", "./feather/wifi.svg")
+	module, err := internal.NewModuleFromConfig(cfg.ModuleConfig)
+	// module, err := NewModule("network", "{{.Connection}}", "{{.IP}}", "./feather/wifi.svg")
 	if err != nil {
 		return nil, err
 	}
