@@ -12,7 +12,7 @@ import (
 
 type MemConfig struct {
 	*internal.ModuleConfig
-	//TODO: internal
+	UpdateInterval int `hcl:"interval"`
 }
 type MemData struct {
 	UsedPercent string
@@ -36,7 +36,7 @@ func InitMemFromConfig(cfg MemConfig) (gtk.IWidget, error) {
 				UsedPercent: fmt.Sprintf("%.0f", m.UsedPercent),
 			}
 			module.Render(data)
-			time.Sleep(5 * time.Second)
+			time.Sleep(time.Duration(cfg.UpdateInterval) * time.Second)
 		}
 	}()
 

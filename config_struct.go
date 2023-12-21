@@ -6,8 +6,14 @@ type Config struct {
 }
 
 type Bar struct {
-	Name  string       `hcl:"name"`
-	Clock *ClockConfig `hcl:"clock,block"`
+	Name        string            `hcl:"name"`
+	Clock       *ClockConfig      `hcl:"clock,block"`
+	Battery     *BatteryConfig    `hcl:"battery,block"`
+	CPU         *CPUConfig        `hcl:"cpu,block"`
+	Memory      *MemConfig        `hcl:"memory,block"`
+	Network     *NetworkConfig    `hcl:"network,block"`
+	PulseAudio  *PulseAudioConfig `hcl:"pulseaudio,block"`
+	Temperature *TempConfig       `hcl:"temperature,block"`
 }
 
 type Image struct {
