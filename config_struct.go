@@ -14,6 +14,7 @@ type Bar struct {
 	Network     *NetworkConfig    `hcl:"network,block"`
 	PulseAudio  *PulseAudioConfig `hcl:"pulseaudio,block"`
 	Temperature *TempConfig       `hcl:"temperature,block"`
+	Icon        *IconConfig       `hcl:"icon,block"`
 }
 
 type Image struct {

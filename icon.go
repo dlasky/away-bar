@@ -5,16 +5,12 @@ import (
 	"github.com/gotk3/gotk3/gtk"
 )
 
-type IconType string
+type IconConfig struct {
+	Name string `hcl:"name"`
+}
 
-const (
-	Static IconType = "static"
-	Value           = "value"
-	Range           = "range"
-)
-
-func InitIcon(name string) (*gtk.Image, error) {
-	icon, err := glib.IconNewForString(name)
+func InitIconFromConfig(cfg IconConfig) (*gtk.Image, error) {
+	icon, err := glib.IconNewForString(cfg.Name)
 	if err != nil {
 		return nil, err
 	}
