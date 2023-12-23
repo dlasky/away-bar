@@ -9,7 +9,7 @@ type IconConfig struct {
 	Name string `hcl:"name"`
 }
 
-func InitIconFromConfig(cfg IconConfig) (*gtk.Image, error) {
+func InitIconFromConfig(cfg *IconConfig) (*gtk.Image, error) {
 	icon, err := glib.IconNewForString(cfg.Name)
 	if err != nil {
 		return nil, err
