@@ -1,38 +1,30 @@
-package main
+package workspace
 
 import (
+	"dlasky/away-bar/internal"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/rkoesters/xdg/desktop"
 )
 
 var desktops map[string]string = map[string]string{}
 
-func getEnv(key string, def string) string {
-	val := os.Getenv(key)
-	if val == "" {
-		return def
-	}
-	return val
-}
-
 func getXDGData() []string {
 	out := []string{}
-	home := getEnv("HOME", "~/")
-	dataHome := getEnv("XDG_DATA_HOME", ".local/share")
+	home := internal.GetEnv("HOME", "~/")
+	dataHome := internal.GetEnv("XDG_DATA_HOME", ".local/share")
 	appLocal := filepath.Join(home, dataHome, "applications")
 	out = append(out, appLocal)
 	defDirs := "/usr/local/share/applications:/usr/share/applications"
-	dataDirs := strings.Split(getEnv("XDG_DATA_DIRS", defDirs), ":")
+	dataDirs := strings.Split(internal.GetEnv("XDG_DATA_DIRS", defDirs), ":")
 	out = append(out, dataDirs...)
 	return out
 }
 
-func cacheDesktops() {
+func CacheDesktops() {
 	dataDirs := getXDGData()
 
 	for _, dir := range dataDirs {
@@ -59,5 +51,4 @@ func cacheDesktops() {
 			}
 		}
 	}
-	spew.Dump(desktops)
 }

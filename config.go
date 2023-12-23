@@ -1,6 +1,7 @@
 package main
 
 import (
+	"dlasky/away-bar/internal"
 	"dlasky/away-bar/modules"
 	"fmt"
 	"log"
@@ -14,9 +15,9 @@ func getConfig() (*Config, error) {
 
 	//TODO: allow an explicit pathing here as well via flags
 
-	user := getEnv("USER", "")
-	home := getEnv("XDG_HOME", "/home/"+user)
-	cfg := getEnv("XDG_CONFIG", ".config")
+	user := internal.GetEnv("USER", "")
+	home := internal.GetEnv("XDG_HOME", "/home/"+user)
+	cfg := internal.GetEnv("XDG_CONFIG", ".config")
 	conf := path.Join(home, cfg, "/awaybar/config.hcl")
 
 	fmt.Printf("conf %v", conf)

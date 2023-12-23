@@ -4,10 +4,10 @@ import "dlasky/away-bar/modules"
 
 type Config struct {
 	// LogLevel string `hcl:"log_level"`
-	Bar Bar `hcl:"bar,block"`
+	Bar *BarConfig `hcl:"bar,block"`
 }
 
-type Bar struct {
+type BarConfig struct {
 	Name        string                    `hcl:"name"`
 	Clock       *modules.ClockConfig      `hcl:"clock,block"`
 	Battery     *modules.BatteryConfig    `hcl:"battery,block"`

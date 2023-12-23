@@ -1,6 +1,7 @@
 package main
 
 import (
+	"dlasky/away-bar/workspace"
 	"fmt"
 	"log"
 
@@ -13,7 +14,7 @@ func main() {
 	// Initialize GTK without parsing any command line arguments.
 	gtk.Init(nil)
 
-	cacheDesktops()
+	workspace.CacheDesktops()
 
 	css, err := gtk.CssProviderNew()
 	if err != nil {
