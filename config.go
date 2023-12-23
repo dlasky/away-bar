@@ -1,6 +1,7 @@
 package main
 
 import (
+	"dlasky/away-bar/modules"
 	"fmt"
 	"log"
 	"path"
@@ -32,7 +33,7 @@ func getConfig() (*Config, error) {
 func setupFromConfig(bar *gtk.Box, config *Config) error {
 
 	if config.Bar.Clock != nil {
-		w, err := InitClockWithConfig(*config.Bar.Clock)
+		w, err := modules.InitClockWithConfig(*config.Bar.Clock)
 		if err != nil {
 			fmt.Println(err)
 		}
