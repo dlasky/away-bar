@@ -4,10 +4,11 @@ import "dlasky/away-bar/modules"
 
 type Config struct {
 	// LogLevel string `hcl:"log_level"`
-	Bar *BarConfig `hcl:"bar,block"`
+	Bar    *BarConfig    `hcl:"bar,block"`
+	Module *ModuleConfig `hcl:"module,block"`
 }
 
-type BarConfig struct {
+type ModuleConfig struct {
 	Name        string                    `hcl:"name"`
 	Clock       *modules.ClockConfig      `hcl:"clock,block"`
 	Battery     *modules.BatteryConfig    `hcl:"battery,block"`
@@ -18,12 +19,4 @@ type BarConfig struct {
 	Temperature *modules.TempConfig       `hcl:"temperature,block"`
 	Icon        *modules.IconConfig       `hcl:"icon,block"`
 	Image       *modules.ImageConfig      `hcl:"image,block"`
-}
-
-type Image struct {
-	Path string `hcl:"path"`
-}
-
-type DynamicImage struct {
-	Ranges map[int]string `hcl:"ranges"`
 }

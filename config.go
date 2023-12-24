@@ -20,7 +20,7 @@ func getConfig() (*Config, error) {
 	cfg := internal.GetEnv("XDG_CONFIG", ".config")
 	conf := path.Join(home, cfg, "/awaybar/config.hcl")
 
-	fmt.Printf("conf %v", conf)
+	fmt.Printf("conf path: %v", conf)
 
 	var config Config
 	err := hclsimple.DecodeFile(conf, nil, &config)
@@ -33,8 +33,8 @@ func getConfig() (*Config, error) {
 
 func setupFromConfig(bar *gtk.Box, config *Config) error {
 
-	if config.Bar.Clock != nil {
-		w, err := modules.InitClockWithConfig(*config.Bar.Clock)
+	if config.Module.Clock != nil {
+		w, err := modules.InitClockWithConfig(*config.Module.Clock)
 		if err != nil {
 			fmt.Println(err)
 		}

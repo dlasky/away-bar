@@ -70,9 +70,12 @@ func getName(node *sway.Node) string {
 	return ""
 }
 
-func InitWorkspaces() (gtk.IWidget, error) {
+type WorkspaceConfig struct {
+}
+
+func InitWorkspacesFromConfig(cfg *WorkspaceConfig, ctx context.Context) (gtk.IWidget, error) {
 	//todo get this from app in cliapp possibly
-	ctx := context.Background()
+	// ctx := context.Background()
 	client, err := sway.New(ctx)
 	if err != nil {
 		return nil, err
